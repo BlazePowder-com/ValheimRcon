@@ -123,9 +123,9 @@ namespace ValheimRcon
         private class Patches
         {
             // `ZNet.LoadWorld` is gone from the shipped assembly — it is
-            // `ServerLoadWorld` now, and `Game.Shutdown` is `ShutDown`.
-            // Harmony resolved neither, skipped this class without an error,
-            // and `Startup()` was never called, so the socket never bound.
+            // `ServerLoadWorld` now. Harmony resolved the old name to nothing,
+            // skipped this class without an error, and `Startup()` was never
+            // called, so the socket never bound.
             [HarmonyFinalizer]
             [HarmonyPatch(typeof(ZNet), nameof(ZNet.ServerLoadWorld))]
             private static void ZNet_LoadWorld()
@@ -133,12 +133,10 @@ namespace ValheimRcon
                 Instance.Startup();
             }
 
-            [HarmonyPrefix]
-            [HarmonyPatch(typeof(Game), nameof(Game.ShutDown))]
-            private static void Game_Shutdown()
-            {
-                Instance.ShutDown();
-            }
+            // The shutdown patch is gone with it. `Game.Shutdown` does not
+            // exist either, and there is nothing for it to do here: the
+            // process owns the socket, so it closes when the process does.
+            // One fewer game-internal name to go stale unnoticed.
         }
 
         private class ListCommand : RconCommand
