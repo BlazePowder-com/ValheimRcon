@@ -51,7 +51,7 @@
       <HintPath>Libs\BepInEx.Harmony.dll</HintPath>
     </Reference>
     <Reference Include="LukeSkywalker.IPNetwork, Version=1.3.2.0, Culture=neutral, PublicKeyToken=764160545cf0d618, processorArchitecture=MSIL">
-      <HintPath>packages\IPNetwork.1.3.2.0\lib\LukeSkywalker.IPNetwork.dll</HintPath>
+      <HintPath>Libs\LukeSkywalker.IPNetwork.dll</HintPath>
     </Reference>
     <Reference Include="netstandard">
       <HintPath>Libs\netstandard.dll</HintPath>
@@ -193,12 +193,18 @@
     <PostBuildEvent>
     </PostBuildEvent>
   </PropertyGroup>
-  <Import Project="CreatePluginPackage.targets" />
-  <Import Project="packages\ILRepack.Lib.MSBuild.Task.2.0.44.1\build\ILRepack.Lib.MSBuild.Task.targets" Condition="Exists('packages\ILRepack.Lib.MSBuild.Task.2.0.44.1\build\ILRepack.Lib.MSBuild.Task.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>Данный проект ссылается на пакеты NuGet, отсутствующие на этом компьютере. Используйте восстановление пакетов NuGet, чтобы скачать их.  Дополнительную информацию см. по адресу: http://go.microsoft.com/fwlink/?LinkID=322105. Отсутствует следующий файл: {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('packages\ILRepack.Lib.MSBuild.Task.2.0.44.1\build\ILRepack.Lib.MSBuild.Task.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\ILRepack.Lib.MSBuild.Task.2.0.44.1\build\ILRepack.Lib.MSBuild.Task.targets'))" />
-  </Target>
+  <!--
+    Three build-time imports removed for the BlazePowder build, which runs in a
+    Linux container with no NuGet restore and no PowerShell:
+
+      CreatePluginPackage.targets  zips a Thunderstore package via PowerShell.
+      ILRepack.Lib.MSBuild.Task    merges IPNetwork into the output assembly.
+      EnsureNuGetPackageBuildImports  fails the build when ILRepack is absent.
+
+    Nothing merges now, so LukeSkywalker.IPNetwork.dll ships beside the plugin
+    in BepInEx/plugins/ and is resolved from there. Every reference resolves
+    from Libs/, which the image build fills with the assemblies the guest
+    actually runs — so `nameof(ZNet.ServerLoadWorld)` is checked against the
+    real game rather than against a vendored copy that may have moved on.
+  -->
 </Project>
