@@ -12,6 +12,15 @@
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <!--
+      Both added so this builds off Windows. Upstream CI is `runs-on:
+      windows-latest`, where the .NET Framework 4.8 targeting pack ships with
+      Visual Studio; on Linux `dotnet build` stops at MSB3644 without it, and
+      the pack is only available as a NuGet package, which a non-SDK project
+      reaches only in PackageReference mode.
+    -->
+    <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
+    <LangVersion>latest</LangVersion>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
   </PropertyGroup>
@@ -53,6 +62,10 @@
     <Reference Include="LukeSkywalker.IPNetwork, Version=1.3.2.0, Culture=neutral, PublicKeyToken=764160545cf0d618, processorArchitecture=MSIL">
       <HintPath>Libs\LukeSkywalker.IPNetwork.dll</HintPath>
     </Reference>
+    <!-- Reference assemblies only; nothing from this reaches the output. -->
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <Reference Include="netstandard">
       <HintPath>Libs\netstandard.dll</HintPath>
     </Reference>
